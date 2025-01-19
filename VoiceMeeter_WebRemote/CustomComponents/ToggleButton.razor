@@ -1,0 +1,62 @@
+﻿@using VoiceMeeter
+@inherits NotificationComponent
+
+<section class="toggleButton @(TempActive?"blink_red":"")" @onclick="Toggle" style="border-color: @color; color: @color; @Style">
+    @Text
+</section>
+<style>
+
+</style>
+@code {
+
+    
+    [Parameter]
+    public bool Value
+    {
+        get => _value; 
+        set=> SetProperty(ref _value, value, () => SetColor());       
+    }
+    private bool _value;
+    [Parameter]
+    public bool TempActive
+    {
+        get => _tempActive;
+        set => SetProperty(ref _tempActive, value, () => SetColor());
+    }
+    private bool _tempActive;
+
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string ActiveColor { get; set; }
+
+    [Parameter]
+    public string InactiveColor { get; set; }
+
+
+
+    private string color;
+
+
+    protected override void OnInitialized()
+    {
+        if (!String.IsNullOrWhiteSpace(CommandPath))
+        {
+            var p = Remote.GetParameter(CommandPath);
+            Value = p>0;
+        }
+        base.OnInitialized();        
+    }
+
+
+    private void Toggle(MouseEventArgs e)
+    {
+        Value = !Value;
+        SendUpdate(Value ? 1 : 0);
+    }
+    private void SetColor()
+    {
+        color = Value ? ActiveColor : InactiveColor;
+    }
+}

@@ -1,0 +1,151 @@
+﻿
+<div class="hstack">
+    <section id="HardwareInputSection" class="hstack">
+        <HardwareInputPanel StripId="0" TempMute="GetTempMuted(0)" Console="@this" />
+        <HardwareInputPanel StripId="1" TempMute="GetTempMuted(1)" Console="@this" />
+        <HardwareInputPanel StripId="2" TempMute="GetTempMuted(2)" Console="@this" />
+        <HardwareInputPanel StripId="3" TempMute="GetTempMuted(3)" Console="@this" />
+        <HardwareInputPanel StripId="4" TempMute="GetTempMuted(4)" Console="@this" />
+    </section>
+    <section id="VirtualInputSection" class="hstack">
+        <VirtualInputPanel StripId="5" TempMute="GetTempMuted(5)" Console="@this"></VirtualInputPanel>
+        <VirtualInputPanel StripId="6" TempMute="GetTempMuted(6)" Console="@this"></VirtualInputPanel>
+        <VirtualInputPanel StripId="7" TempMute="GetTempMuted(7)" Console="@this"></VirtualInputPanel>
+    </section>
+</div>
+
+
+<style>
+
+    body {
+    background-color: @Colors.Background_Light
+    }
+
+    .hardwareInputPanel {
+    font-display: block;
+    white-space: nowrap;
+    border-right: solid;
+    border-color: @Colors.Text_Dark;
+    border-width: 2px;
+    width: 155px;
+    padding-left: 5px;
+    }
+
+    .sectionLabel {
+    font-size: 20px;
+    font-weight: bold;
+    color: @Colors.Text_Section_Label;
+    }
+
+    .label {
+    font-size: 12px;
+    color: @Colors.Text_Section_Label;
+    }
+
+    .bold{
+    font-weight: bold;
+    }
+
+    .toggleButton{
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    padding: 2px;        
+    margin-left: auto;
+    margin-right:5px;
+    }
+    .inteliPan{
+    width: 90%;
+    aspect-ratio: 1;
+    background-color: black;
+    margin-left: 5%;
+    }
+    .knob{
+    border: solid;
+    border-width: 3px;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    position: relative;
+    }
+
+    .knob_dot {
+    position: absolute;
+    transform-origin: center center;
+    width: 5px;
+    height: 5px;
+    background-color: white;
+    border-radius: 50%;
+    margin-top: -15px; /* Move the dot to ride the edge of a 30px diameter circle */
+    }
+
+    .knob_label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    cursor: pointer;
+    }
+
+    .fader{
+    height: 250px;
+    width:25px;
+    border-radius: 15px;
+    border: solid;
+    border-width: 3px;
+    }
+    .fader_knob{
+    border: solid;
+    border-width: 3px;
+    border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    position: relative;
+    background-color:dimgrey;
+    opacity:70%;
+    }
+    .fader_label{
+    color:white;
+    width:40px;
+    text-align:center;
+    font-size:12px;
+    }
+
+    .visualizer {
+        height: 250px;
+        width: 25px;
+        border-radius: 2px;
+        border: solid;
+        border-width: 3px;
+        margin:1px;
+        
+    }
+
+    .virtualInputPanel {
+        font-display: block;
+        white-space: nowrap;
+        border-right: solid;
+        border-color: @Colors.Text_Dark;
+        border-width: 2px;
+        width: 155px;
+        padding-left: 5px;
+    }
+    /*Colors*/
+    .darkBackgroud{
+    background-color: @Colors.Background_Dark;
+    }
+</style>
+
+@code{
+    public static List<int> SoloStrips = new List<int>();
+    public void UpdateSoloStrips(){
+        StateHasChanged();
+    }
+
+    public int GetTempMuted(int index){
+        if (!SoloStrips.Any()) return 0;
+        return SoloStrips.Contains(index)?0:1;
+    }
+    public void UpdateState() => StateHasChanged();
+}

@@ -1,0 +1,110 @@
+﻿@inherits NotificationComponent
+@using System.Drawing
+@using VoiceMeeter
+
+<section class="fader" @onmousewheel="OnMouseScroll" style="border-color: @ControlColor; background: linear-gradient(to top, @ControlColor @InLineConverter.ToPercent(percentage), transparent @InLineConverter.ToPercent(percentage)); @Style" draggable="true" @ondrag="OnDrag" @ondragend="OnDragEnd" @ondblclick="OnDoubleClick">
+    <div class="fader_knob" style="transform: translate(-10px,@(250 - (percentage/100*250) -25)px); border-color:@ControlColor;" />
+    <p class="fader_label" style="transform: translate(-10px,@(250 - (percentage/100*250) -55)px);" draggable="true">@Math.Round(@Value, 1)dB</p>
+</section>
+
+
+@code {
+    [Parameter]
+    public double Value
+    {
+        get => _value;
+        set => SetProperty(ref _value,value, () => OnValueChanged());
+    }
+    private double _value;
+    [Parameter]
+    public int Strip
+    {
+        get => _strip;
+        set => SetProperty(ref _strip, value);
+    }
+    private int _strip;
+
+
+    public string ControlColor
+    {
+        get => _controlColor;
+        set => SetProperty(ref _controlColor, value);
+    }
+    private string _controlColor;
+
+    private double left;
+    private double top;
+    private bool isDragging;
+    private Point dragPoint;
+    private double dragValue;
+    private double percentage;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (String.IsNullOrEmpty(CommandPath)) return;
+        var p = Remote.GetParameter(CommandPath);
+        Value = p;
+        top = -50;
+    }
+
+    private void OnValueChanged()
+    {
+        percentage = (Value + 60) / 75 * 100; //75 gives the small gap on top at 100%
+        top = -percentage;
+        CalculateColor();
+        CalculatePosition();
+        SendUpdate((float)Value);
+    }
+
+    private void OnDrag(DragEventArgs e)
+    {
+        if (e.ClientY < 1) return;
+
+
+        if (!isDragging)
+        {
+            dragPoint = new Point((int)e.ClientX, (int)e.ClientY);
+            isDragging = true;
+            dragValue = Value;
+        }
+
+        // Calculate new value based on the drag distance
+        var change = (e.ClientY - dragPoint.Y) * 0.3;
+        var newValue = Math.Round(dragValue - change, 1);
+
+        // Clamp value between 0 and 10
+        Value = newValue < -60 ? -60 : (newValue > 12) ? 12 : newValue;
+    }
+    private void OnDragEnd(DragEventArgs e)
+    {
+        isDragging = false;
+        StateHasChanged();
+    }
+    private void OnDoubleClick(MouseEventArgs e)
+    {
+        Value = 0;
+    }
+
+
+    private void CalculateColor()
+    {
+        ControlColor = Value > 0 ? Colors.Fader_Red : Colors.Fader_Green;
+    }
+    private void CalculatePosition()
+    {
+        var radiusTop = 50; // 25% for vertical radius
+        var radiusLeft = 35; // 35% for horizontal radius
+        var centerTop = 100; // Center point for top
+        var centerLeft = 45; // Center point for left
+        var x = 1 - (Value * 0.1);
+        var angle = x * Math.PI; // Convert to radians (0 to π)
+
+        top = (centerTop - radiusTop * Math.Sin(angle)); // Calculate top position
+        left = (centerLeft + radiusLeft * Math.Cos(angle)); // Calculate left position
+    }
+    private void OnMouseScroll(WheelEventArgs e)
+    {
+    
+        Value -= e.DeltaY/100*3;
+    }
+}

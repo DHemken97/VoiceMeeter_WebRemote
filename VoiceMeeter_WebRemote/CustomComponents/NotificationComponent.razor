@@ -1,0 +1,29 @@
+﻿@using VoiceMeeter
+@code {
+    [Parameter]
+    public Action<NotificationComponent> ValueChanged { get; set; }
+
+    [Parameter]
+    public string Style { get; set; }
+
+    [Parameter]
+    public string CommandPath { get; set; }
+    public void SetProperty<Tobj>(ref Tobj obj, Tobj value, Action action = null ){
+        obj=value;
+        action?.Invoke();
+        StateHasChanged();
+    }
+    protected bool IsInitialized;
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        IsInitialized = true;
+    }
+
+    protected void SendUpdate(float Value)
+    {
+        if (IsInitialized && !string.IsNullOrWhiteSpace(CommandPath))
+            Remote.SetParameter(CommandPath, Value);
+        ValueChanged?.Invoke(this);
+    }
+}

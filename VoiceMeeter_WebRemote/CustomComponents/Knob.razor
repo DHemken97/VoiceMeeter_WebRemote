@@ -1,0 +1,95 @@
+﻿@inherits NotificationComponent
+@using System.Drawing
+@using VoiceMeeter
+
+<section class="knob" style="border-color: @ControlColor; @Style" draggable="true" @ondrag="OnDrag" @ondragend="OnDragEnd" @ondblclick="OnDoubleClick" @onmousewheel="OnMouseScroll">
+    <div class="knob_dot" style="left:@left.ToPercent();top:@top.ToPercent()" />
+    <p class="knob_label" style="color:@ControlColor" draggable="true">@Math.Round(@Value, 1)</p>
+</section>
+
+
+@code {
+    [Parameter]
+    public double Value
+    {
+        get => _value;
+        set => SetProperty(ref _value, value > 10 ? 10 : value < 0 ? 0 : value, () => OnValueChanged());
+    }
+    private double _value;
+
+
+    public string ControlColor
+    {
+        get => _controlColor;
+        set => SetProperty(ref _controlColor, value);
+    }
+    private string _controlColor;
+
+    private double left;
+    private double top;
+    private bool isDragging;
+    private Point dragPoint;
+    private double dragValue;
+
+    protected override void OnInitialized()
+    {
+        if (!string.IsNullOrEmpty(CommandPath))
+            Value = Remote.GetParameter(CommandPath);
+
+        base.OnInitialized();
+    }
+    private void OnValueChanged(){
+        CalculateColor();
+        CalculatePosition();
+        SendUpdate((float)Value );
+    }
+    private void OnDrag(DragEventArgs e)
+    {
+        if (e.ClientY < 1) return;
+
+
+        if (!isDragging)
+        {
+            dragPoint = new Point((int)e.ClientX, (int)e.ClientY);
+            isDragging = true;
+            dragValue = Value;
+        }
+
+        // Calculate new value based on the drag distance
+        var change = (e.ClientY - dragPoint.Y) * 0.1;
+        var newValue = Math.Round(dragValue - change, 1);
+
+        // Clamp value between 0 and 10
+        Value = newValue < 0 ? 0 : (newValue > 10) ? 10 : newValue;
+    }
+    private void OnDragEnd(DragEventArgs e)
+    {
+        isDragging = false;
+        StateHasChanged();
+    }
+    private void OnDoubleClick(MouseEventArgs e)
+    {
+        Value = 0;
+    }
+
+
+    private void CalculateColor(){
+        ControlColor = Value > 0 ? Colors.Knob_Active : Colors.Knob_Inactive;
+    }
+    private void CalculatePosition(){
+        var radiusTop = 50; // 25% for vertical radius
+        var radiusLeft = 35; // 35% for horizontal radius
+        var centerTop = 100; // Center point for top
+        var centerLeft = 45; // Center point for left
+        var x = 1 - (Value * 0.1);
+        var angle = x * Math.PI; // Convert to radians (0 to π)
+
+        top = (centerTop - radiusTop * Math.Sin(angle)); // Calculate top position
+        left = (centerLeft + radiusLeft * Math.Cos(angle)); // Calculate left position
+    }
+    private void OnMouseScroll(WheelEventArgs e)
+    {
+
+        Value -= e.DeltaY / 100 ;
+    }
+}
