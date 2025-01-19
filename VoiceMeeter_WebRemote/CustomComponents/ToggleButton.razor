@@ -9,7 +9,7 @@
 </style>
 @code {
 
-    
+
     [Parameter]
     public bool Value
     {
@@ -42,10 +42,7 @@
     protected override void OnInitialized()
     {
         if (!String.IsNullOrWhiteSpace(CommandPath))
-        {
-            var p = Remote.GetParameter(CommandPath);
-            Value = p>0;
-        }
+            RefreshValue();
         base.OnInitialized();        
     }
 
@@ -58,5 +55,13 @@
     private void SetColor()
     {
         color = Value ? ActiveColor : InactiveColor;
+    }
+
+    public override void RefreshValue()
+    {
+        var p = RemoteGetParameter(CommandPath);
+        _value = p > 0;
+        SetColor();
+
     }
 }

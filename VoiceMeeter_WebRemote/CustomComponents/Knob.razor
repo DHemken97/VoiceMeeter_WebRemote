@@ -3,7 +3,7 @@
 @using VoiceMeeter
 
 <section class="knob" style="border-color: @ControlColor; @Style" draggable="true" @ondrag="OnDrag" @ondragend="OnDragEnd" @ondblclick="OnDoubleClick" @onmousewheel="OnMouseScroll">
-    <div class="knob_dot" style="left:@left.ToPercent();top:@top.ToPercent()" />
+    <div class="knob_dot" style="left:@left.ToPercent();top:@top.ToPercent();" />
     <p class="knob_label" style="color:@ControlColor" draggable="true">@Math.Round(@Value, 1)</p>
 </section>
 
@@ -34,9 +34,17 @@
     protected override void OnInitialized()
     {
         if (!string.IsNullOrEmpty(CommandPath))
-            Value = Remote.GetParameter(CommandPath);
-
+            RefreshValue();
+        else
+            Value = 0;
         base.OnInitialized();
+    }
+    public override void RefreshValue()
+    {
+        var p = RemoteGetParameter(CommandPath);
+        _value = p;
+        CalculateColor();
+        CalculatePosition();
     }
     private void OnValueChanged(){
         CalculateColor();

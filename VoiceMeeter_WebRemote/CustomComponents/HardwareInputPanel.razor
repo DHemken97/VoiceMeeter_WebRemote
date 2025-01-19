@@ -51,7 +51,7 @@
         </div>
         <section class="hstack">
            
-            <LevelVisualizer Channels=2 StartChannel="@(StripId*2)"></LevelVisualizer>
+            <LevelVisualizer Channels=2 StartChannel="@(StripId*2)" levelType="Voicemeeter.LevelType.PostFaderInput"></LevelVisualizer>
 
             
             <Fader CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Gain")"></Fader>

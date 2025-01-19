@@ -1,4 +1,7 @@
 ﻿@using VoiceMeeter
+@inject ILogger<NotificationComponent> _logger
+@inject IJSRuntime JS
+
 @code {
     [Parameter]
     public Action<NotificationComponent> ValueChanged { get; set; }
@@ -11,19 +14,50 @@
     public void SetProperty<Tobj>(ref Tobj obj, Tobj value, Action action = null ){
         obj=value;
         action?.Invoke();
-        StateHasChanged();
+        InvokeAsync(() =>
+       {
+           StateHasChanged();
+       });
     }
     protected bool IsInitialized;
     protected override void OnInitialized()
     {
         base.OnInitialized();
         IsInitialized = true;
+        VoiceMeeterConsole.Inst.RegisterComponent(this);
     }
-
+    public virtual void RefreshValue(){
+        // throw new Exception("Please Overwrite Refresh Procedure");
+    }
     protected void SendUpdate(float Value)
     {
-        if (IsInitialized && !string.IsNullOrWhiteSpace(CommandPath))
-            Remote.SetParameter(CommandPath, Value);
-        ValueChanged?.Invoke(this);
+        try{
+
+            if (IsInitialized && !string.IsNullOrWhiteSpace(CommandPath))
+                Remote.SetParameter(CommandPath, Value);
+            ValueChanged?.Invoke(this);
+        }
+        catch(Exception ex){
+            Log(ex.Message);
+
+            _logger.LogError(ex, ex.Message);
+
+        }
+    }
+
+    public float RemoteGetParameter(string path){
+        if (string.IsNullOrWhiteSpace(path)) return 0;
+        try{
+            var p = Remote.GetParameter(CommandPath);
+            return p;
+        }
+        catch(Exception ex){
+            Log(ex.Message);
+            _logger.LogError(ex, ex.Message);
+        }
+        return 0;
+    }
+    public async Task Log(string msg){
+                await JS.InvokeVoidAsync("console.log",msg);
     }
 }

@@ -1,17 +1,36 @@
-﻿
-<div class="hstack">
-    <section id="HardwareInputSection" class="hstack">
-        <HardwareInputPanel StripId="0" TempMute="GetTempMuted(0)" Console="@this" />
-        <HardwareInputPanel StripId="1" TempMute="GetTempMuted(1)" Console="@this" />
-        <HardwareInputPanel StripId="2" TempMute="GetTempMuted(2)" Console="@this" />
-        <HardwareInputPanel StripId="3" TempMute="GetTempMuted(3)" Console="@this" />
-        <HardwareInputPanel StripId="4" TempMute="GetTempMuted(4)" Console="@this" />
-    </section>
-    <section id="VirtualInputSection" class="hstack">
-        <VirtualInputPanel StripId="5" TempMute="GetTempMuted(5)" Console="@this"></VirtualInputPanel>
-        <VirtualInputPanel StripId="6" TempMute="GetTempMuted(6)" Console="@this"></VirtualInputPanel>
-        <VirtualInputPanel StripId="7" TempMute="GetTempMuted(7)" Console="@this"></VirtualInputPanel>
-    </section>
+﻿@using VoiceMeeter
+<div>
+    <div class="hstack">
+        <section id="HardwareInputSection" class="hstack">
+            <HardwareInputPanel StripId="0" TempMute="GetTempMuted(0)" Console="@this" />
+            <HardwareInputPanel StripId="1" TempMute="GetTempMuted(1)" Console="@this" />
+            <HardwareInputPanel StripId="2" TempMute="GetTempMuted(2)" Console="@this" />
+            <HardwareInputPanel StripId="3" TempMute="GetTempMuted(3)" Console="@this" />
+            <HardwareInputPanel StripId="4" TempMute="GetTempMuted(4)" Console="@this" />
+        </section>
+        <section id="VirtualInputSection" class="hstack">
+            <VirtualInputPanel StripId="5" TempMute="GetTempMuted(5)" Console="@this"></VirtualInputPanel>
+            <VirtualInputPanel StripId="6" TempMute="GetTempMuted(6)" Console="@this"></VirtualInputPanel>
+            <VirtualInputPanel StripId="7" TempMute="GetTempMuted(7)" Console="@this"></VirtualInputPanel>
+        </section>
+        <div style="height:100%; width:525px;">
+            <div style="height:200px;border: solid; border-color:red; margin-top:20px;"></div>
+            <p class="sectionLabel" style="height:10px;width:100%;text-align:center; ">MASTER SECTION</p>
+            <div class="hstack" style="height:475px; width:100%; margin-top: auto;border-top:solid; border-color:@Colors.Text_Dark;">
+                <OutputPanel Bus="0"/>
+                <OutputPanel Bus="1" />
+                <OutputPanel Bus="2" />
+                <OutputPanel Bus="3" />
+                <OutputPanel Bus="4" />
+                <OutputPanel Bus="5" />
+                <OutputPanel Bus="6" />
+                <OutputPanel Bus="7" />
+            </div>
+        </div>
+    </div>
+    <input id="CommandText" onkeyup="HandleKeyDown" bind-value="@Command" placeholder="Type here..." />
+
+
 </div>
 
 
@@ -56,6 +75,14 @@
     }
     .inteliPan{
     width: 90%;
+    aspect-ratio: 1;
+    background-color: black;
+    margin-left: 5%;
+    }
+
+    .pan {
+    width: 60px;
+    height:60px;
     aspect-ratio: 1;
     background-color: black;
     margin-left: 5%;
@@ -113,24 +140,36 @@
     }
 
     .visualizer {
-        height: 250px;
-        width: 25px;
-        border-radius: 2px;
-        border: solid;
-        border-width: 3px;
-        margin:1px;
-        
+    height: 250px;
+    width: 25px;
+    border-radius: 2px;
+    border: solid;
+    border-width: 3px;
+    margin:1px;
+
     }
 
     .virtualInputPanel {
-        font-display: block;
-        white-space: nowrap;
-        border-right: solid;
-        border-color: @Colors.Text_Dark;
-        border-width: 2px;
-        width: 155px;
-        padding-left: 5px;
+    font-display: block;
+    white-space: nowrap;
+    border-right: solid;
+    border-color: @Colors.Text_Dark;
+    border-width: 2px;
+    width: 105px;
+    padding-left: 5px;
     }
+
+
+    .outputPanel {
+    font-display: block;
+    white-space: nowrap;
+    border-right: solid;
+    border-color: @Colors.Text_Dark;
+    border-width: 2px;
+    width: 65px;
+    padding-left: 5px;
+    }
+
     /*Colors*/
     .darkBackgroud{
     background-color: @Colors.Background_Dark;
@@ -139,13 +178,55 @@
 
 @code{
     public static List<int> SoloStrips = new List<int>();
-    public void UpdateSoloStrips(){
-        StateHasChanged();
+    public static VoiceMeeterConsole Inst{ get; set; }
+    public List<NotificationComponent> NotificationComponents = new List<NotificationComponent>();
+    private System.Timers.Timer _timer;
+    public string Command { get; set; }
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _timer = new System.Timers.Timer();
+        _timer.Interval = 100;
+        _timer.Elapsed += (s, e) => UpdateComponents();
+        _timer.AutoReset = true;
+        _timer.Start();
+
     }
 
+    public void RegisterComponent(NotificationComponent component){
+        if (!NotificationComponents.Contains(component)) ;
+        NotificationComponents.Add(component);
+    }
     public int GetTempMuted(int index){
+        Inst ??= this;
         if (!SoloStrips.Any()) return 0;
         return SoloStrips.Contains(index)?0:1;
     }
-    public void UpdateState() => StateHasChanged();
+    public void UpdateState() => InvokeAsync(() =>
+       {
+           StateHasChanged();
+       }); 
+
+    public void UpdateComponents(){
+
+        if (VoiceMeeter.Remote.IsParametersDirty()<=0) return;
+        foreach(var component in NotificationComponents){
+            InvokeAsync(() =>
+   {
+       component.RefreshValue();
+       });
+        }
+        UpdateState();
+    }
+
+
+    private void HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            var value = "";
+            Console.WriteLine($"Input value: {value}");
+        }
+    }
+
 }

@@ -42,11 +42,18 @@
     {
         base.OnParametersSet();
         if (String.IsNullOrEmpty(CommandPath)) return;
-        var p = Remote.GetParameter(CommandPath);
-        Value = p;
+        RefreshValue();
         top = -50;
     }
-
+    public override void RefreshValue()
+    {
+        var p = RemoteGetParameter(CommandPath);       
+        _value = p;  
+        percentage = (Value + 60) / 75 * 100; //75 gives the small gap on top at 100%
+        top = -percentage;
+        CalculateColor();
+        CalculatePosition();
+    }
     private void OnValueChanged()
     {
         percentage = (Value + 60) / 75 * 100; //75 gives the small gap on top at 100%

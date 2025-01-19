@@ -1,86 +1,52 @@
-﻿<section id="strip_@StripId" class="virtualInputPanel">
-    <div class="sectionLabel">Virtual Input @(StripId + 1)</div>
+﻿<section id="strip_@StripId" class="virtualInputPanel" style="height:100%;">
+    <div class="sectionLabel" style="margin-top:0px; font-size:14px;">Virtual Input @(StripId + 1)</div>
     <div class="label">48.0 kHz - 7168 L</div>
     <section class="darkBackgroud">
-        <div class="hstack">
+        <div class="hstack" style="padding-top:15px;">
             <p class="label">EQUALIZER</p>          
         </div>
         <div class ="hstack">
-            <Knob /> 
-            <div style="padding-left:10px;">
-                <p class="label" >Treble</p>
-                <p class="sectionLabel" >0.0</p>
+            <Knob style="margin-top:-25px; margin-left:5px; margin-right:10px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].EQGain3")" />
+            <div style="padding-left:10px; margin-top:-10px;">
+                <p class="label" style="margin-top:-10px;" >Treble</p>
+                <p class="sectionLabel" style="margin-top:-20px;">0.0</p>
             </div>     
         </div>
 
                 <div class ="hstack">
-            <div style="padding-right:10px;">
-                <p class="label" >Treble</p>
-                <p class="sectionLabel" >0.0</p>
+            <div style="padding-left:10px;">
+                <p class="sectionLabel" style="margin-top:-10px;">0.0</p>
             </div>
-            <Knob />
+            <Knob style="margin-top:-25px; margin-left:20px; margin-right:5px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].EQGain2")" />
+
 
         </div>
 
-        <div class="hstack">
-            <Knob />
-            <div style="padding-left:10px;">
-                <p class="label">Treble</p>
-                <p class="sectionLabel">0.0</p>
-            </div>
+        <div class="hstack" style="padding-bottom:5px;">
+            <Knob style="margin-top:-25px; margin-left:5px; margin-right:10px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].EQGain1")" />
+            <div style="padding-left:10px; margin-top:-5px;">
+                <p class="sectionLabel" style="margin-top:-5px;">0.0</p>
+                <p class="label" style="margin-top:-20px;">Bass</p>
+
+            </div>   
         </div>
 
 
 
         
         <div class="hstack">
-            <p class="label">Comp.</p>
-            <p class="label" style="text-align: center; width:100%">Gate</p>
-            <p class="label" style="margin-left:auto;">Denoise</p>
+         
+            <div class="pan" />
+            <div style="padding-left:4px;">
+                <LevelVisualizer Channels=2 StartChannel="@(StripId*2)" Style="height:60px;" levelType="Voicemeeter.LevelType.PostFaderInput"></LevelVisualizer>
+            </div>
         </div>
-        <div class="hstack">
-            <Knob CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Comp")" />
-            <Knob Style="margin-left:14px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Gate")" />
-            <Knob Style="margin-left:auto;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Denoiser")" />
-        </div>
-        <div class="hstack" style="padding-top:15px;">
-            <div class="label">reverb</div>
-            <div class="label bold" style="text-align: center; width:100%">SPECIAL FX</div>
-            <div class="label" style="margin-left:auto;">Delay</div>
-        </div>
-        <div class="hstack">
-            <ToggleButton 
-            Style="font-size:8px;" 
-            Text="Post" 
-            ActiveColor="@Colors.Toggle_Button_Active_Blue" 
-            InactiveColor="@Colors.Toggle_Button_Inactive"
-            CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].PostReverb")" />
-            <Knob CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Reverb")" />
-            <Knob Style="margin-left:auto;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Delay")" />
-            <ToggleButton 
-            Style="font-size:8px;"
-            Text="Post"
-            ActiveColor="@Colors.Toggle_Button_Active_Blue"
-            InactiveColor="@Colors.Toggle_Button_Inactive"
-            CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].PostDelay")" />
-        </div>
-        <div class="hstack" style="padding-top:15px;">
-            <div class="label">Send 1</div>
-            <div class="label bold" style="text-align: center; width:100%">External FX</div>
-            <div class="label" style="margin-left:auto;">Send 2</div>
-        </div>
-        <div class="hstack">
-            <ToggleButton Style="font-size:8px;" Text="Post" ActiveColor="@Colors.Toggle_Button_Active_Blue" InactiveColor="@Colors.Toggle_Button_Inactive" />
-            <Knob />
-            <Knob Style="margin-left:auto;" />
-            <ToggleButton Style="font-size:8px;" Text="Post" ActiveColor="@Colors.Toggle_Button_Active_Blue" InactiveColor="@Colors.Toggle_Button_Inactive" />
-        </div>
+        <div class="hstack" style="height:155px;">
+         </div>
         <section class="hstack">
            
-            <LevelVisualizer Channels=2 StartChannel="@(StripId*2)"></LevelVisualizer>
-
             
-            <Fader CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Gain")"></Fader>
+            <Fader CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Gain")" Style="margin-left:10px;"></Fader>
             <div style="margin-left:auto;">
                 <ToggleButton Text="▶A1" ActiveColor="@Colors.Toggle_Button_Active_Green" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].A1")" />
                 <ToggleButton Text="▶A2" ActiveColor="@Colors.Toggle_Button_Active_Green" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].A2")"/>
@@ -90,7 +56,7 @@
                 <ToggleButton Text="▶B1" ActiveColor="@Colors.Toggle_Button_Active_Green" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].B1")" />
                 <ToggleButton Text="▶B2" ActiveColor="@Colors.Toggle_Button_Active_Green" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].B2")" />
                 <ToggleButton Text="▶B3" ActiveColor="@Colors.Toggle_Button_Active_Green" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].B3")" />
-                <ToggleButton Text="mono" ActiveColor="@Colors.Toggle_Button_Active_Blue" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Mono")" />
+                <ToggleButton Text="MC" ActiveColor="@Colors.Toggle_Button_Active_Red" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].MC")" />
                 <ToggleButton Text="solo" ActiveColor="@Colors.Toggle_Button_Active_Yellow" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Solo")" ValueChanged="OnSoloChanged" />
                 <ToggleButton Text="Mute" ActiveColor="@Colors.Toggle_Button_Active_Red" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Strip[",@StripId.ToString(),"].Mute")" TempActive="@(TempMute>0)" />
 

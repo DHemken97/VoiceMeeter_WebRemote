@@ -1,0 +1,31 @@
+﻿<div class="outputPanel">
+    <ToggleButton Text="SEL" ActiveColor="@Colors.Toggle_Button_Active_Yellow" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Bus[",Bus.ToString(),"].Sel")"/>
+    <div style="height:50px;" />
+    <p class="label">FX RET.</p>
+    <div class="hstack" style="padding:0px; margin-top:-15px;">
+        <Knob />
+        <p class="label" style="margin-top:auto; margin-bottom:0px;">R</p>
+    </div>
+    <div class="hstack">
+        <Knob />
+        <p class="label" style="margin-top:auto; margin-bottom:0px;">D</p>
+    </div>
+    <div>
+        <ToggleButton Text="mono" ActiveColor="@Colors.Toggle_Button_Active_Blue" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Bus[",Bus.ToString(),"].Mono")" />
+        <ToggleButton Text="EQ" ActiveColor="@Colors.Toggle_Button_Active_Blue" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Bus[",Bus.ToString(),"].EQ")" />
+        <ToggleButton Text="Mute" ActiveColor="@Colors.Toggle_Button_Active_Red" InactiveColor="@Colors.Toggle_Button_Inactive" style="font-size:12px;" CommandPath="@InLineConverter.Concat("Bus[",Bus.ToString(),"].Mute")" />
+
+    </div>
+    <div class="hstack" style="height:175px; margin-bottom:5px; margin-top:auto; padding-top:5px;">
+        <LevelVisualizer Channels=2 StartChannel="@(Bus*8)" Style="height:100%;" levelType="Voicemeeter.LevelType.Output"></LevelVisualizer>
+
+
+        <Fader CommandPath="@InLineConverter.Concat("Bus[",Bus.ToString(),"].Gain")" Style="height:100%; margin-left:-15px;"></Fader>
+
+    </div>
+
+</div>
+@code {
+    [Parameter]
+    public int Bus { get; set; }
+}

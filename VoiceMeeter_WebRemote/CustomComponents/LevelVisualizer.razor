@@ -11,6 +11,8 @@
     public int Channels { get; set; }
     [Parameter]
     public int StartChannel { get; set; }
+    [Parameter]
+    public Voicemeeter.LevelType levelType { get; set; }
 
     public string ControlColor => "Red";
     private float[] ChannelValues;
@@ -23,7 +25,7 @@
         for(var i=StartChannel; i<(StartChannel+Channels); i++)
             channels.Add(new Voicemeeter.Levels.Channel
                 {
-                         LevelType = Voicemeeter.LevelType.PostFaderInput,
+                         LevelType = levelType,
                          ChannelNumber = i
                      });
 
@@ -51,8 +53,17 @@
 
     public void SetValue(float[] vals)
     {
-        ChannelValues = vals;
+        for (var i = 0; i < ChannelValues.Length; i++)
+        {
+            if (vals[i] >= 0)
+                ChannelValues[i] = (vals[i] + ChannelValues[i]) / 2;
+            else
+                ChannelValues[i] = ChannelValues[i]/2;
 
+           
+
+            }
+          
         InvokeAsync(() =>
        {
            StateHasChanged(); // Refresh UI
@@ -60,6 +71,7 @@
     }
 
     public string GetColor(int index){
+        if (ChannelValues?.Length <= index) return "orange";
         var percent = ConvertLevelToPercentage(ChannelValues[index]);
         if (percent < 60) return "grey";
         if (percent < 95) return "green";
