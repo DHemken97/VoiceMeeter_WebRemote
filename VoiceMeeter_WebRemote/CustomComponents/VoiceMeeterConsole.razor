@@ -28,7 +28,7 @@
             </div>
         </div>
     </div>
-    <input id="CommandText" onkeyup="HandleKeyDown" bind-value="@Command" placeholder="Type here..." />
+    <input value="@InputText" @onkeydown="HandleKeyDown" placeholder="Type here..." />
 
 
 </div>
@@ -181,7 +181,6 @@
     public static VoiceMeeterConsole Inst{ get; set; }
     public List<NotificationComponent> NotificationComponents = new List<NotificationComponent>();
     private System.Timers.Timer _timer;
-    public string Command { get; set; }
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -218,15 +217,27 @@
         }
         UpdateState();
     }
-
+    private string InputText { get; set; } = "";
 
     private void HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter")
         {
-            var value = "";
-            Console.WriteLine($"Input value: {value}");
+            SubmitInput();
         }
+        else if (e.Key.Length==1)
+            InputText +=e.Key.ToString();
     }
 
+    private void SubmitInput()
+    {
+        var parts = InputText.Split("=");
+        if (parts.Length==2)
+            Remote.SetParameter(parts[0], float.Parse(parts[1]));
+
+
+        InputText = string.Empty;
+
+        StateHasChanged();
+    }
 }
